@@ -43,7 +43,7 @@ enable_language(ASM)
 # execute_process
 
 option(USE_RVO_2_0 "" ON)
-set(USE_RVO_2_0  ON)
+
 
 
 
@@ -71,8 +71,8 @@ FILE(GLOB_RECURSE SOURCES_C ${CMAKE_SOURCE_DIR}/*.c ${CMAKE_SOURCE_DIR}/*.cpp ${
 # list(FILTER <list> <INCLUDE|EXCLUDE> REGEX <regular_expression>)  
 LIST(FILTER SOURCES_H EXCLUDE REGEX "build")
 LIST(FILTER SOURCES_C EXCLUDE REGEX "build")
-LIST(FILTER SOURCES_H EXCLUDE REGEX "vs_sln")
-LIST(FILTER SOURCES_C EXCLUDE REGEX "vs_sln")
+LIST(FILTER SOURCES_H EXCLUDE REGEX "vs_sln*")
+LIST(FILTER SOURCES_C EXCLUDE REGEX "vs_sln*")
 
 if(USE_RVO_2_0)
     message("USE_RVO_2_0")

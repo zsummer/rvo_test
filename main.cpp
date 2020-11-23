@@ -145,7 +145,7 @@ void setupScenario(RVO::RVOSimulator* sim)
 
 #ifdef USE_RVO_2_0
     /* Specify the default parameters for agents that are subsequently added. */
-    sim->setAgentDefaults(100.0f, 15, sim->getTimeStep() * 20, sim->getTimeStep() * 10, 5.0f, 10.0f);
+    sim->setAgentDefaults(50.0f, 15, sim->getTimeStep() * 20, sim->getTimeStep() * 10, 5.0f, 10.0f);
 #else
     /* Specify the default parameters for agents that are subsequently added. */
     sim->setAgentDefaults(15, 100.0f, 15, 5.0f, 5.0f, 10.0f, 10.0f, 1.0f);
@@ -159,7 +159,7 @@ void setupScenario(RVO::RVOSimulator* sim)
      * opposite side of the environment.
      */
 #ifdef USE_RVO_2_0
-    for (int i = 0; i < 1000; ++i)
+    for (int i = 0; i < 100; ++i)
     {
         RVO::Vector2 target = 200.0f * RVO::Vector2(std::cos(i * 2.0f * M_PI / 30.0f), std::sin(i * 2.0f * M_PI / 30.0f));
         if (rand()%5 == 0)
@@ -183,9 +183,9 @@ void setupScenario(RVO::RVOSimulator* sim)
         }
     }
 
-    sim->addObstacle({ {0, 20}, {-20, 20}, {-20, 0}, {0, 0} });
-    sim->addObstacle({ {100, -50},  {80, -50} });
-    sim->addObstacle({ {-100, 100},  {-100, 120} });
+   // sim->addObstacle({ {0, 20}, {-20, 20}, {-20, 0}, {0, 0} });
+    //sim->addObstacle({ {100, -50},  {80, -50} });
+   // sim->addObstacle({ {-100, 100},  {-100, 120} });
 #else
     for (int i = 0; i < 100; ++i)
     {
@@ -236,7 +236,7 @@ void setPreferredVelocities(RVO::RVOSimulator* sim)
     for (int i = 0; i < static_cast<int>(sim->getNumAgents()); ++i) 
     {
         RVO::Vector2 goalVector = goals[i] - sim->getAgentPosition(i);
-        sim->setAgentPrefSpeed(i, sim->getAgentMaxSpeed(i));
+        sim->setAgentPrefSpeed(i, sim->getAgentMaxSpeed(i)/2.0f);
     }
 
 #endif
