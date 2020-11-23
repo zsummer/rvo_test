@@ -131,23 +131,34 @@ void draw_line(float wide, const Point3&color, const RVO::Vector2 &begin, const 
 const float M_PI = 3.14159265358979323846f;
 #endif
 /* Create a new simulator instance. */
+#ifdef USE_RVO_2_0
 RVO::RVOSimulator* sim = new RVO::RVOSimulator();
-
+#else
+RVO::RVOSimulator* sim = RVO::RVOSimulator::Instance();
+#endif
 /* Store the goals of the agents. */
 std::vector<RVO::Vector2> goals;
 
 void setupScenario(RVO::RVOSimulator* sim)
 {
+    
+
+#ifdef USE_RVO_2_0
+    /* Specify the default parameters for agents that are subsequently added. */
+    sim->setAgentDefaults(100.0f, 15, sim->getTimeStep() * 20, sim->getTimeStep() * 10, 5.0f, 10.0f);
+#else
+    /* Specify the default parameters for agents that are subsequently added. */
+    sim->setAgentDefaults(15, 100.0f, 15, 5.0f, 5.0f, 10.0f, 10.0f, 1.0f);
+#endif
     /* Specify the global time step of the simulation. */
     sim->setTimeStep(0.01f);
 
-    /* Specify the default parameters for agents that are subsequently added. */
-    sim->setAgentDefaults(100.0f, 15, sim->getTimeStep()* 20, sim->getTimeStep()*10, 5.0f, 10.0f);
 
     /*
      * Add agents, specifying their start position, and store their goals on the
      * opposite side of the environment.
      */
+#ifdef USE_RVO_2_0
     for (int i = 0; i < 1000; ++i)
     {
         RVO::Vector2 target = 200.0f * RVO::Vector2(std::cos(i * 2.0f * M_PI / 30.0f), std::sin(i * 2.0f * M_PI / 30.0f));
@@ -175,14 +186,42 @@ void setupScenario(RVO::RVOSimulator* sim)
     sim->addObstacle({ {0, 20}, {-20, 20}, {-20, 0}, {0, 0} });
     sim->addObstacle({ {100, -50},  {80, -50} });
     sim->addObstacle({ {-100, 100},  {-100, 120} });
+#else
+    for (int i = 0; i < 100; ++i)
+    {
+        RVO::Vector2 target = 200.0f * RVO::Vector2(std::cos(i * 2.0f * M_PI / 30.0f), std::sin(i * 2.0f * M_PI / 30.0f));
+        if (rand() % 5 == 0)
+        {
+            int goal = sim->addGoal(-target);
+            int id = sim->addAgent(target, goal);
+            sim->setAgentPosition(id, sim->getAgentPosition(id) / 2.0f);
+            sim->setAgentRadius(id, 5 + rand() % 100 / 10.0f);
+            sim->setAgentMaxSpeed(id, 0.0f);
+            goals.push_back(-sim->getAgentPosition(id));
+        }
+        else if (rand() % 3 == 0)
+        {
+            continue;
+        }
+        else
+        {
+            int goal = sim->addGoal(-target);
+            int id = sim->addAgent(target, goal);
+            sim->setAgentRadius(id, 5 + rand() % 100 / 10.0f);
+            sim->setAgentMaxSpeed(id, sim->getAgentRadius(id) * 10.0f);
+            goals.push_back(-sim->getAgentPosition(id));
+        }
+    }
+    sim->initSimulation();
+#endif
 }
 
 void setPreferredVelocities(RVO::RVOSimulator* sim)
 {
-
+#ifdef USE_RVO_2_0
     for (int i = 0; i < static_cast<int>(sim->getNumAgents()); ++i) {
         RVO::Vector2 goalVector = goals[i] - sim->getAgentPosition(i);
-
+        
         if (RVO::abs(goalVector) > sim->getTimeStep() * sim->getAgentMaxSpeed(i)) 
         {
             goalVector = RVO::normalize(goalVector);
@@ -193,6 +232,14 @@ void setPreferredVelocities(RVO::RVOSimulator* sim)
             sim->setAgentPrefVelocity(i, RVO::Vector2());
         }
     }
+#else
+    for (int i = 0; i < static_cast<int>(sim->getNumAgents()); ++i) 
+    {
+        RVO::Vector2 goalVector = goals[i] - sim->getAgentPosition(i);
+        sim->setAgentPrefSpeed(i, sim->getAgentMaxSpeed(i));
+    }
+
+#endif
 }
 
 bool reachedGoal(RVO::RVOSimulator* sim)
@@ -200,9 +247,16 @@ bool reachedGoal(RVO::RVOSimulator* sim)
     /* Check if all agents have reached their goals. */
     for (size_t i = 0; i < sim->getNumAgents(); ++i)
     {
+#ifdef USE_RVO_2_0
         if (RVO::absSq(sim->getAgentPosition(i) - goals[i]) > sim->getAgentRadius(i) * sim->getAgentRadius(i)) {
             return false;
         }
+#else
+        if (absSq(sim->getAgentPosition(i) - goals[i]) > sim->getAgentRadius(i) * sim->getAgentRadius(i)) {
+            return false;
+        }
+#endif
+
     }
 
     return true;
@@ -225,6 +279,7 @@ void drawAgent(RVO::RVOSimulator* sim, double now)
 
     static const float MAP_SIZE = 300.0f;
 
+#ifdef USE_RVO_2_2
     for (RVO::Obstacle* obstacle : sim->obstacles_)
     {
         RVO::Obstacle* head = obstacle;
@@ -239,13 +294,17 @@ void drawAgent(RVO::RVOSimulator* sim, double now)
             }
         }
     }
+
+
     for (int i = 0; i < sim->getNumAgents(); i++)
     {
         auto pos = sim->getAgentPosition(i) / MAP_SIZE;
         auto target = goals[i] / MAP_SIZE;
         auto radius = sim->getAgentRadius(i) / MAP_SIZE;
+
         auto ho = sim->getAgentTimeHorizon(i) / MAP_SIZE;
         auto hobst = sim->getAgentTimeHorizonObst(i) / MAP_SIZE;
+
 
         if (abs(sim->getAgentVelocity(i)) > 0.001)
         {
@@ -270,13 +329,16 @@ void drawAgent(RVO::RVOSimulator* sim, double now)
         }
 
     }
+#endif
 
     for (int i = 0; i < sim->getNumAgents(); i++)
     {
         auto pos = sim->getAgentPosition(i) / MAP_SIZE;
         auto radius = sim->getAgentRadius(i) / MAP_SIZE;
+#ifdef USE_RVO_2_2
         auto ho = sim->getAgentTimeHorizon(i) / MAP_SIZE;
         auto hobst = sim->getAgentTimeHorizonObst(i) / MAP_SIZE;
+#endif
         auto target = goals[i] / MAP_SIZE;
         
         /*

@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.7)
-project(rvo)
+project(rvo_test)
 enable_language(ASM)
 
 #from github.com/zsummer
@@ -42,6 +42,11 @@ enable_language(ASM)
 # 
 # execute_process
 
+option(USE_RVO_2_0 "" ON)
+set(USE_RVO_2_0  ON)
+
+
+
 #分组添加到IDE
 macro(GROUP_SRC_BY_DIR FILES)
     foreach(PATH_NAME ${${FILES}})
@@ -66,6 +71,22 @@ FILE(GLOB_RECURSE SOURCES_C ${CMAKE_SOURCE_DIR}/*.c ${CMAKE_SOURCE_DIR}/*.cpp ${
 # list(FILTER <list> <INCLUDE|EXCLUDE> REGEX <regular_expression>)  
 LIST(FILTER SOURCES_H EXCLUDE REGEX "build")
 LIST(FILTER SOURCES_C EXCLUDE REGEX "build")
+LIST(FILTER SOURCES_H EXCLUDE REGEX "vs_sln")
+LIST(FILTER SOURCES_C EXCLUDE REGEX "vs_sln")
+
+if(USE_RVO_2_0)
+    message("USE_RVO_2_0")
+    LIST(FILTER SOURCES_H EXCLUDE REGEX "rvo_1_0")
+    LIST(FILTER SOURCES_C EXCLUDE REGEX "rvo_1_0")
+    ADD_DEFINITIONS(-DUSE_RVO_2_0)
+else()
+    message("USE_RVO_1_0")
+    LIST(FILTER SOURCES_H EXCLUDE REGEX "rvo_2_0")
+    LIST(FILTER SOURCES_C EXCLUDE REGEX "rvo_2_0")
+    ADD_DEFINITIONS(-DUSE_RVO_1_0)
+endif()
+
+
 set(SOURCES ${SOURCES_H} ${SOURCES_C})
 GROUP_SRC_BY_DIR(SOURCES)
 

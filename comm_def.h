@@ -32,33 +32,6 @@ typedef float f32;
 
 inline void empty_test(...) {}
 
-#define error_tlog LOGFMTE
-#define spell_error_tlog LOGFMTE
-#define debug_tlog empty_test
-#define spell_debug_tlog empty_test
-
-
-
-enum SpellRangeType
-{
-    SPELL_RANGE_TYPE_NULL = 0, //无效
-    SPELL_RANGE_TYPE_SINGLE = 1, //单体
-    SPELL_RANGE_TYPE_AOE = 2, //群体AOE
-    SPELL_RANGE_TYPE_INHERIT = 3, //继承
-};
-
-
-enum SpellRangeShape {
-    SPELL_RANGE_SHAPE_CIRCLE = 0,
-    SPELL_RANGE_SHAPE_FAN = 1,
-    SPELL_RANGE_SHAPE_RECT = 2,
-    SPELL_RANGE_SHAPE_RING = 3,
-    SPELL_RANGE_SHAPE_FRAME = 4
-};
-
-
-
-
 
 
 
