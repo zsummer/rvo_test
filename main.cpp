@@ -87,9 +87,9 @@
 #define SCREEN_X 800
 #define SCREEN_Y 800
 
-Point3 rgb(float r, float g, float b)
+std::tuple<float, float, float> rgb(float r, float g, float b)
 {
-    return Point3(r / 255.0f, g / 255.0f, b / 255.0f);
+    return { r / 255.0f, g / 255.0f, b / 255.0f };
 }
 
 static void error_callback(int error, const char* description)
@@ -103,11 +103,11 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
         glfwSetWindowShouldClose(window, GLFW_TRUE);
 }
 
-void draw_circle(float wide, const Point3& color, const RVO::Vector2& center)
+void draw_circle(float wide, const std::tuple<float, float, float>& color, const RVO::Vector2& center)
 {
     constexpr const float V_COUNT = 80.0;
     wide = wide > 1.0f ? 1.0 : wide;
-    glColor3f(color.x, color.y, color.z);
+    glColor3f(std::get<0>(color), std::get<1>(color), std::get<2>(color));
     glBegin(GL_POLYGON);
     for (int i = 0; i < V_COUNT; i++)
     {
@@ -116,11 +116,11 @@ void draw_circle(float wide, const Point3& color, const RVO::Vector2& center)
     glEnd();
 }
 
-void draw_line(float wide, const Point3&color, const RVO::Vector2 &begin, const RVO::Vector2&end)
+void draw_line(float wide, const std::tuple<float, float, float>&color, const RVO::Vector2 &begin, const RVO::Vector2&end)
 {
 	glLineWidth(wide);
 	glBegin(GL_LINE_STRIP);
-	glColor3f(color.x, color.y, color.z);    // Red
+	glColor3f(std::get<0>(color)/255.0f, std::get<1>(color), std::get<2>(color));    // Red
 	glVertex2f(begin.x(), begin.y());
 	glVertex2f(end.x(), end.y());
 	glEnd();
@@ -159,10 +159,10 @@ void setupScenario(RVO::RVOSimulator* sim)
      * opposite side of the environment.
      */
 #ifdef USE_RVO_2_0
-    for (int i = 0; i < 100; ++i)
+    for (int i = 0; i < 10; ++i)
     {
         RVO::Vector2 target = 200.0f * RVO::Vector2(std::cos(i * 2.0f * M_PI / 30.0f), std::sin(i * 2.0f * M_PI / 30.0f));
-        if (rand()%5 == 0)
+        if (rand()%5 == 0 && i!=0)
         {
             int id = sim->addAgent(target);
             sim->setAgentPosition(id, sim->getAgentPosition(id) / 2.0f);
@@ -170,7 +170,7 @@ void setupScenario(RVO::RVOSimulator* sim)
             sim->setAgentMaxSpeed(id, 0.0f);
             goals.push_back(-sim->getAgentPosition(id));
         }
-        else if (rand()%3 == 0)
+        else if (rand()%3 == 0 && i != 0)
         {
             continue;
         }
@@ -279,14 +279,14 @@ void drawAgent(RVO::RVOSimulator* sim, double now)
 
     static const float MAP_SIZE = 300.0f;
 
-#ifdef USE_RVO_2_2
+#ifdef USE_RVO_2_0
     for (RVO::Obstacle* obstacle : sim->obstacles_)
     {
         RVO::Obstacle* head = obstacle;
         while (head && head->nextObstacle_)
         {
             draw_circle(5.0f / MAP_SIZE, rgb(241, 210, 202), (head->point_ + head->unitDir_ * 5.0f) / MAP_SIZE);
-            draw_line(3.0f, rgb(241, 110, 202), head->point_ / MAP_SIZE, head->nextObstacle_->point_ / MAP_SIZE);
+            draw_line(3.0f, rgb(8, 8, 8), head->point_ / MAP_SIZE, head->nextObstacle_->point_ / MAP_SIZE);
             head = head->nextObstacle_;
             if (head == obstacle)
             {
@@ -314,7 +314,7 @@ void drawAgent(RVO::RVOSimulator* sim, double now)
 
         for (int j = 0; j < 30; j++)
         {
-            draw_line(0.7f, rgb(180, 228, 248), pos, pos +
+            draw_line(0.3f, rgb(180, 228, 248), pos, pos +
                 RVO::Vector2(std::cos(j * 2.0f * M_PI / 20.0f),
                     std::sin(j * 2.0f * M_PI / 20.0f))
                 * (sim->getAgentTimeHorizon(i) * sim->getAgentMaxSpeed(i) + sim->getAgentRadius(i)) / MAP_SIZE);
@@ -322,7 +322,7 @@ void drawAgent(RVO::RVOSimulator* sim, double now)
 
         for (int j = 0; j < 20; j++)
         {
-            draw_line(1.4f, rgb(110, 202, 241), pos, pos +
+            draw_line(0.4f, rgb(110, 202, 241), pos, pos +
                 RVO::Vector2(std::cos(j * 2.0f * M_PI / 20.0f),
                     std::sin(j * 2.0f * M_PI / 20.0f))
                 * (sim->getAgentTimeHorizonObst(i) * sim->getAgentMaxSpeed(i) + sim->getAgentRadius(i)) / MAP_SIZE);
@@ -356,6 +356,7 @@ void drawAgent(RVO::RVOSimulator* sim, double now)
         if (abs(dir) > 0.0001)
         {
             draw_circle(radius, rgb(40, 177, 234), pos);
+
             RVO::Vector2 vel = dir;
             draw_line(3.0,
                 rgb(241, 110, 137),
@@ -366,7 +367,10 @@ void drawAgent(RVO::RVOSimulator* sim, double now)
         {
             draw_circle(radius, rgb(241, 110, 202), pos);
         }
-
+        if (i == 0)
+        {
+            draw_circle(radius/3.0f, rgb(40, 77, 234), pos);
+        }
     }
     
 }

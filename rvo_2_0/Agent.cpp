@@ -34,7 +34,19 @@
 
 #include "KdTree.h"
 #include "Obstacle.h"
+#include <tuple>
+std::tuple<float, float, float> rgb(float r, float g, float b);
+void draw_line(float wide, const std::tuple<float, float, float>& color, const RVO::Vector2& begin, const RVO::Vector2& end);
+#define DRAW_LINE1() 					if (this->id_ == 0)\
+{\
+	draw_line(0.5f, rgb(41.0f, 110.0f, 202.0f), line.point, (line.point + line.direction));\
+}
+#define DRAW_LINE2() 					if (this->id_ == 0)\
+{\
+	draw_line(0.5f, rgb(41.0f, 10.0f, 202.0f), line.point, (line.point + line.direction));\
+}
 
+static const float MAP_SIZE = 300.0f;
 namespace RVO {
 	Agent::Agent(RVOSimulator *sim) : maxNeighbors_(0), maxSpeed_(0.0f), neighborDist_(0.0f), radius_(0.0f), sim_(sim), timeHorizon_(0.0f), timeHorizonObst_(0.0f), id_(0) { }
 
@@ -104,6 +116,9 @@ namespace RVO {
 					line.point = Vector2(0.0f, 0.0f);
 					line.direction = normalize(Vector2(-relativePosition1.y(), relativePosition1.x()));
 					orcaLines_.push_back(line);
+					DRAW_LINE1();
+
+
 				}
 
 				continue;
@@ -115,6 +130,7 @@ namespace RVO {
 					line.point = Vector2(0.0f, 0.0f);
 					line.direction = normalize(Vector2(-relativePosition2.y(), relativePosition2.x()));
 					orcaLines_.push_back(line);
+					DRAW_LINE1()
 				}
 
 				continue;
@@ -124,6 +140,7 @@ namespace RVO {
 				line.point = Vector2(0.0f, 0.0f);
 				line.direction = -obstacle1->unitDir_;
 				orcaLines_.push_back(line);
+				DRAW_LINE1()
 				continue;
 			}
 
@@ -230,6 +247,7 @@ namespace RVO {
 				line.direction = Vector2(unitW.y(), -unitW.x());
 				line.point = leftCutoff + radius_ * invTimeHorizonObst * unitW;
 				orcaLines_.push_back(line);
+				DRAW_LINE1()
 				continue;
 			}
 			else if (t > 1.0f && tRight < 0.0f) {
@@ -239,6 +257,7 @@ namespace RVO {
 				line.direction = Vector2(unitW.y(), -unitW.x());
 				line.point = rightCutoff + radius_ * invTimeHorizonObst * unitW;
 				orcaLines_.push_back(line);
+				DRAW_LINE1()
 				continue;
 			}
 
@@ -255,6 +274,7 @@ namespace RVO {
 				line.direction = -obstacle1->unitDir_;
 				line.point = leftCutoff + radius_ * invTimeHorizonObst * Vector2(-line.direction.y(), line.direction.x());
 				orcaLines_.push_back(line);
+				DRAW_LINE1()
 				continue;
 			}
 			else if (distSqLeft <= distSqRight) {
@@ -266,6 +286,7 @@ namespace RVO {
 				line.direction = leftLegDirection;
 				line.point = leftCutoff + radius_ * invTimeHorizonObst * Vector2(-line.direction.y(), line.direction.x());
 				orcaLines_.push_back(line);
+				DRAW_LINE1()
 				continue;
 			}
 			else {
@@ -277,6 +298,7 @@ namespace RVO {
 				line.direction = -rightLegDirection;
 				line.point = rightCutoff + radius_ * invTimeHorizonObst * Vector2(-line.direction.y(), line.direction.x());
 				orcaLines_.push_back(line);
+				DRAW_LINE1()
 				continue;
 			}
 		}
@@ -348,6 +370,7 @@ namespace RVO {
 
 			line.point = velocity_ + 0.5f * u;
 			orcaLines_.push_back(line);
+			DRAW_LINE2();
 		}
 
 		size_t lineFail = linearProgram2(orcaLines_, maxSpeed_, prefVelocity_, false, newVelocity_);
