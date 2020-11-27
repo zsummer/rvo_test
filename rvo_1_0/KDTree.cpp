@@ -56,7 +56,7 @@ namespace RVO {
         while (r >= l && (vertical ? _sim->_agents[_agentIDs[r]]->_p.x() : _sim->_agents[_agentIDs[r]]->_p.y()) >= splitValue) {
           --r;
         } 
-        if (l > r) {
+        if (l >= r) {
           break;
         } else {
           std::swap(_agentIDs[l], _agentIDs[r]);
@@ -66,7 +66,10 @@ namespace RVO {
       }
 
       int leftsize = l - begin;
-      
+      if (leftsize > 0)
+      {
+
+      }
       _agentTree[node].left = node + 1;
       _agentTree[node].right = node + 1 + (2 * leftsize - 1);
 
