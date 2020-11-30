@@ -35,15 +35,17 @@
 #include "KdTree.h"
 #include "Obstacle.h"
 #include <tuple>
-std::tuple<float, float, float> rgb(float r, float g, float b);
-void draw_line(float wide, const std::tuple<float, float, float>& color, const RVO::Vector2& begin, const RVO::Vector2& end);
+#include "comm_def.h"
+
+static std::tuple<float, float> ToTuple(RVO::Vector2 v) { return { v.x(), v.y() }; }
+
 #define DRAW_LINE1() 					if (this->id_ == 0)\
 {\
-	draw_line(0.5f, rgb(41.0f, 110.0f, 202.0f), line.point, (line.point + line.direction));\
+	draw_line(0.5f, rgb(41.0f, 110.0f, 202.0f), ToTuple(line.point / MAP_SIZE), ToTuple(line.point + line.direction));\
 }
 #define DRAW_LINE2() 					if (this->id_ == 0)\
 {\
-	draw_line(0.5f, rgb(41.0f, 10.0f, 202.0f), line.point, (line.point + line.direction));\
+	draw_line(0.5f, rgb(41.0f, 10.0f, 202.0f), ToTuple(line.point / MAP_SIZE), ToTuple(line.point + line.direction));\
 }
 
 static const float MAP_SIZE = 300.0f;
@@ -464,11 +466,11 @@ namespace RVO {
 
 			if (denominator >= 0.0f) {
 				/* Line i bounds line lineNo on the right. */
-				tRight = std::min(tRight, t);
+				tRight = min(tRight, t);
 			}
 			else {
 				/* Line i bounds line lineNo on the left. */
-				tLeft = std::max(tLeft, t);
+				tLeft = max(tLeft, t);
 			}
 
 			if (tLeft > tRight) {

@@ -20,14 +20,15 @@
 
 #include <vector3.h>
 #include <functional>
-
+#include "fn_log.h"
+using Point3 = Vector3<float>;
 using DrawLine = 
 std::function<void(float /*line_wide*/, const Point3&/*color*/, const Point3&/*begin*/, const Point3&/*end*/)>;
 
 struct Agent
 {
 	int id = 0;
-	Vector3 pos;
+	Point3 pos;
 	struct Agent * next = nullptr;
 	struct Agent * front = nullptr;
 };
@@ -41,8 +42,8 @@ struct KDNode
 	struct KDNode * left = nullptr;
 	struct KDNode * right = nullptr;
 	int dim = 0;
-	Vector3 pos;
-	Vector3 vct;
+	Point3 pos;
+	Point3 vct;
 };
 
 
@@ -70,7 +71,7 @@ public:
 	void clear(Node* node, int depth);
 	void clear()
 	{
-		LOGD() << "clear kd-tree";
+		LogDebug() << "clear kd-tree";
 		clear(head_, 0);
 		head_ = nullptr;
 		node_count_ = 0;
@@ -139,7 +140,7 @@ public:
 		}
 	}
 
-	Node* get_node(const Vector3& pos, Node* node)
+	Node* get_node(const Point3& pos, Node* node)
 	{
 		if (node->right == NULL && node->left == NULL)
 		{
@@ -147,16 +148,16 @@ public:
 		}
 		if (node->right == NULL || node->left == NULL)
 		{
-			LOGE()<< "node only has one child. ";
+			LogError()<< "node only has one child. ";
 			return NULL;
 		}
 		if (pos.x < node->pos.x || pos.x >= node->pos.x + node->vct.x)
 		{
-			LOGE() << "out node";
+			LogError() << "out node";
 		}
 		if (pos.y < node->pos.y || pos.y >= node->pos.y + node->vct.y)
 		{
-			LOGE() << "out node";
+			LogError() << "out node";
 		}
 		if (node->dim == 0)
 		{
@@ -174,7 +175,7 @@ public:
 		return get_node(pos, node->right);
 	}
 
-	Node* get_node(const Vector3& pos)
+	Node* get_node(const Point3& pos)
 	{
 		if (head_ == NULL)
 		{
@@ -188,7 +189,7 @@ public:
 			|| pos.y < head_->pos.y 
 			|| pos.y > head_->pos.y + head_->vct.y)
 		{
-			LOGE() << "out map.";
+			LogError() << "out map.";
 			return NULL;
 		}
 
@@ -201,7 +202,7 @@ public:
 		Node* node = get_node(in_agent.pos);
 		if (node == NULL)
 		{
-			LOGE() << "insert error";
+			LogError() << "insert error";
 			return NULL;
 		}
 
@@ -248,12 +249,12 @@ public:
 
 		if (x_avg < node->pos.x || x_avg >= node->pos.x + node->vct.x)
 		{
-			LOGE() << "out node";
+			LogError() << "out node";
 		}
 
 		if (y_avg < node->pos.y || y_avg >= node->pos.y + node->vct.y)
 		{
-			LOGE() << "out node";
+			LogError() << "out node";
 		}
 
 //		if (node->parent == NULL || node->parent->dim == 1)
@@ -340,7 +341,7 @@ public:
 		Agent * ptr = node->agent;
 		while (ptr != NULL)
 		{
-			float d = (ptr->pos - pos).SquareLength();
+			float d = (ptr->pos - pos).square_length();
 			if (d < sq_dist)
 			{
 				e = ptr;
