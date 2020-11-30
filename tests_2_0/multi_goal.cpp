@@ -45,10 +45,12 @@ std::vector<RVO::Vector2> goals;
 
 void setupScenario(RVO::RVOSimulator* sim)
 {
-    /* Specify the default parameters for agents that are subsequently added. */
-    sim->setAgentDefaults(50.0f, 15, sim->getTimeStep() * 20, sim->getTimeStep() * 10, 5.0f, 10.0f);
     /* Specify the global time step of the simulation. */
     sim->setTimeStep(0.01f);
+
+    /* Specify the default parameters for agents that are subsequently added. */
+    sim->setAgentDefaults(30.0f, 15, 1.1, 1.1, 5.0f, 10.0f);
+
 
 
     /*
@@ -167,21 +169,6 @@ void drawAgent(RVO::RVOSimulator* sim, double now)
         }
 
 
-        for (int j = 0; j < 1; j++)
-        {
-            draw_line(0.3f, rgb(180, 228, 248), pos, pos +
-                RVO::Vector2(std::cos(j * 2.0f * M_PI / 20.0f),
-                    std::sin(j * 2.0f * M_PI / 20.0f))
-                * (sim->getAgentTimeHorizon(i) * sim->getAgentMaxSpeed(i) + sim->getAgentRadius(i)) / MAP_SIZE);
-        }
-
-        for (int j = 0; j < 1; j++)
-        {
-            draw_line(0.4f, rgb(110, 202, 241), pos, pos +
-                RVO::Vector2(std::cos(j * 2.0f * M_PI / 20.0f),
-                    std::sin(j * 2.0f * M_PI / 20.0f))
-                * (sim->getAgentTimeHorizonObst(i) * sim->getAgentMaxSpeed(i) + sim->getAgentRadius(i)) / MAP_SIZE);
-        }
 
     }
 

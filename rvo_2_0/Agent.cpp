@@ -45,6 +45,7 @@ static std::tuple<float, float> ToTuple(RVO::Vector2 v) { return { v.x(), v.y() 
 }
 #define DRAW_LINE2() 					if (this->id_ == 0)\
 {\
+	draw_circle(0.01f, rgb(41.0f, 10.0f, 202.0f), ToTuple(line.point / MAP_SIZE));\
 	draw_line(0.5f, rgb(41.0f, 10.0f, 202.0f), ToTuple(line.point / MAP_SIZE), ToTuple(line.point + line.direction));\
 }
 
