@@ -45,9 +45,22 @@ static std::tuple<float, float> ToTuple(RVO::Vector2 v) { return { v.x(), v.y() 
 }
 #define DRAW_LINE2() 					if (this->id_ == 0)\
 {\
-	draw_circle(0.01f, rgb(41.0f, 10.0f, 202.0f), ToTuple(line.point / MAP_SIZE));\
-	draw_line(0.5f, rgb(41.0f, 10.0f, 202.0f), ToTuple(line.point / MAP_SIZE), ToTuple(line.point + line.direction));\
+	RVO::Vector2 orca = line.direction; \
+	RVO::Vector2 pos = position_ + line.point; \
+	orca.x_ = -line.direction.y_; \
+	orca.y_ = line.direction.x_; \
+	draw_circle(0.01f, rgb(41.0f, 10.0f, 202.0f), ToTuple(pos / MAP_SIZE));\
+	draw_line(0.5f, rgb(41.0f, 10.0f, 202.0f), ToTuple(pos / MAP_SIZE  - line.direction/2.0f), ToTuple(pos/ MAP_SIZE + line.direction/2.0f));\
+	draw_line(0.5f, rgb(41.0f, 10.0f, 202.0f), ToTuple(pos / MAP_SIZE - orca * radius_ / MAP_SIZE), ToTuple(pos/ MAP_SIZE - orca * radius_ / MAP_SIZE + line.direction/2.0f));\
+	draw_line(0.5f, rgb(41.0f, 10.0f, 202.0f), ToTuple(pos / MAP_SIZE), ToTuple(pos/ MAP_SIZE + orca/10.0f));\
+	draw_line(0.5f, rgb(41.0f, 10.0f, 202.0f), ToTuple(pos / MAP_SIZE + line.direction/10.0f), ToTuple(pos/ MAP_SIZE + line.direction/10.0f + orca/10.0f));\
+	draw_line(0.5f, rgb(41.0f, 10.0f, 202.0f), ToTuple(pos / MAP_SIZE - line.direction/10.0f), ToTuple(pos/ MAP_SIZE - line.direction/10.0f + orca/10.0f));\
+	draw_line(0.5f, rgb(41.0f, 10.0f, 202.0f), ToTuple(pos / MAP_SIZE + line.direction/5.0f), ToTuple(pos/ MAP_SIZE + line.direction/5.0f + orca/10.0f));\
+	draw_line(0.5f, rgb(41.0f, 10.0f, 202.0f), ToTuple(pos / MAP_SIZE - line.direction/5.0f), ToTuple(pos/ MAP_SIZE - line.direction/5.0f + orca/10.0f));\
+	draw_line(0.5f, rgb(41.0f, 10.0f, 202.0f), ToTuple(pos / MAP_SIZE + line.direction/3.0f), ToTuple(pos/ MAP_SIZE + line.direction/3.0f + orca/10.0f));\
+	draw_line(0.5f, rgb(41.0f, 10.0f, 202.0f), ToTuple(pos / MAP_SIZE - line.direction/3.0f), ToTuple(pos/ MAP_SIZE - line.direction/3.0f + orca/10.0f));\
 }
+
 
 static const float MAP_SIZE = 300.0f;
 namespace RVO {
@@ -119,7 +132,7 @@ namespace RVO {
 					line.point = Vector2(0.0f, 0.0f);
 					line.direction = normalize(Vector2(-relativePosition1.y(), relativePosition1.x()));
 					orcaLines_.push_back(line);
-					DRAW_LINE1();
+					DRAW_LINE2();
 
 
 				}
@@ -133,7 +146,7 @@ namespace RVO {
 					line.point = Vector2(0.0f, 0.0f);
 					line.direction = normalize(Vector2(-relativePosition2.y(), relativePosition2.x()));
 					orcaLines_.push_back(line);
-					DRAW_LINE1()
+					DRAW_LINE2()
 				}
 
 				continue;
@@ -143,7 +156,7 @@ namespace RVO {
 				line.point = Vector2(0.0f, 0.0f);
 				line.direction = -obstacle1->unitDir_;
 				orcaLines_.push_back(line);
-				DRAW_LINE1()
+				DRAW_LINE2()
 				continue;
 			}
 
@@ -250,7 +263,7 @@ namespace RVO {
 				line.direction = Vector2(unitW.y(), -unitW.x());
 				line.point = leftCutoff + radius_ * invTimeHorizonObst * unitW;
 				orcaLines_.push_back(line);
-				DRAW_LINE1()
+				DRAW_LINE2()
 				continue;
 			}
 			else if (t > 1.0f && tRight < 0.0f) {
@@ -260,7 +273,7 @@ namespace RVO {
 				line.direction = Vector2(unitW.y(), -unitW.x());
 				line.point = rightCutoff + radius_ * invTimeHorizonObst * unitW;
 				orcaLines_.push_back(line);
-				DRAW_LINE1()
+				DRAW_LINE2()
 				continue;
 			}
 
@@ -277,7 +290,7 @@ namespace RVO {
 				line.direction = -obstacle1->unitDir_;
 				line.point = leftCutoff + radius_ * invTimeHorizonObst * Vector2(-line.direction.y(), line.direction.x());
 				orcaLines_.push_back(line);
-				DRAW_LINE1()
+				DRAW_LINE2()
 				continue;
 			}
 			else if (distSqLeft <= distSqRight) {
@@ -289,7 +302,7 @@ namespace RVO {
 				line.direction = leftLegDirection;
 				line.point = leftCutoff + radius_ * invTimeHorizonObst * Vector2(-line.direction.y(), line.direction.x());
 				orcaLines_.push_back(line);
-				DRAW_LINE1()
+				DRAW_LINE2()
 				continue;
 			}
 			else {
@@ -301,7 +314,7 @@ namespace RVO {
 				line.direction = -rightLegDirection;
 				line.point = rightCutoff + radius_ * invTimeHorizonObst * Vector2(-line.direction.y(), line.direction.x());
 				orcaLines_.push_back(line);
-				DRAW_LINE1()
+				DRAW_LINE2()
 				continue;
 			}
 		}
