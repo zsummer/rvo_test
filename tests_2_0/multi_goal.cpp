@@ -49,7 +49,7 @@ void setupScenario(RVO::RVOSimulator* sim)
     sim->setTimeStep(0.01f);
 
     /* Specify the default parameters for agents that are subsequently added. */
-    sim->setAgentDefaults(30.0f, 15, 1.1, 1.1, 5.0f, 10.0f);
+    sim->setAgentDefaults(20.0f, 15, 1.1, 1.1, 5.0f, 10.0f);
 
 
 
@@ -58,13 +58,13 @@ void setupScenario(RVO::RVOSimulator* sim)
      * opposite side of the environment.
      */
 
-    for (int i = 0; i < 10; ++i)
+    for (int i = 0; i < 1000; ++i)
     {
         RVO::Vector2 src_pos = 200.0f * RVO::Vector2(std::cos(i * 2.0f * M_PI / 30.0f), std::sin(i * 2.0f * M_PI / 30.0f));
         if (rand()%5 == 0 && i!=0)
         {
             int id = sim->addAgent(src_pos /2.0f);
-            sim->setAgentRadius(id, 5 + rand() % 100 / 10.0f);
+            sim->setAgentRadius(id, 1 + rand() % 100 / 20.0f);
             sim->setAgentMaxSpeed(id, 0.0f);
             goals.push_back(-sim->getAgentPosition(id));
         }
@@ -75,7 +75,7 @@ void setupScenario(RVO::RVOSimulator* sim)
         else
         {
             int id = sim->addAgent(src_pos);
-            sim->setAgentRadius(id, 5 + rand() % 100 / 10.0f);
+            sim->setAgentRadius(id, 1 + rand() % 100 / 20.0f);
             sim->setAgentMaxSpeed(id, sim->getAgentRadius(id) * 10.0f);
             goals.push_back(-sim->getAgentPosition(id));
         }
@@ -143,7 +143,6 @@ void drawAgent(RVO::RVOSimulator* sim, double now)
         while (head && head->nextObstacle_)
         {
             draw_circle(5.0f / MAP_SIZE, rgb(241, 210, 202), (head->point_ + head->unitDir_ * 5.0f) / MAP_SIZE);
-            draw_line(3.0f, rgb(8, 8, 8), head->point_ / MAP_SIZE, head->nextObstacle_->point_ / MAP_SIZE);
             head = head->nextObstacle_;
             if (head == obstacle)
             {
@@ -165,7 +164,7 @@ void drawAgent(RVO::RVOSimulator* sim, double now)
 
         if (abs(sim->getAgentVelocity(i)) > 0.001)
         {
-            draw_line(0.5f, rgb(248, 180, 228), pos, target);
+            draw_line(0.3f, rgb(248, 180, 228), pos, target);
         }
 
 
@@ -183,7 +182,7 @@ void drawAgent(RVO::RVOSimulator* sim, double now)
             draw_circle(radius, rgb(40, 177, 234), pos);
 
             RVO::Vector2 vel = dir;
-            draw_line(3.0,
+            draw_line(1.0,
                 rgb(241, 110, 137),
                 sim->getAgentPosition(i) / MAP_SIZE,
                 (sim->getAgentPosition(i) + vel) / MAP_SIZE);

@@ -39,11 +39,8 @@
 
 static std::tuple<float, float> ToTuple(RVO::Vector2 v) { return { v.x(), v.y() }; }
 
-#define DRAW_LINE1() 					if (this->id_ == 0)\
-{\
-	draw_line(0.5f, rgb(41.0f, 110.0f, 202.0f), ToTuple(line.point / MAP_SIZE), ToTuple(line.point + line.direction));\
-}
-#define DRAW_LINE2() 					if (this->id_ == 0)\
+
+#define DRAW_LINE() 					if (this->id_ == 0)\
 {\
 	RVO::Vector2 orca = line.direction; \
 	RVO::Vector2 pos = position_ + line.point; \
@@ -60,7 +57,8 @@ static std::tuple<float, float> ToTuple(RVO::Vector2 v) { return { v.x(), v.y() 
 	draw_line(0.5f, rgb(41.0f, 10.0f, 202.0f), ToTuple(pos / MAP_SIZE + line.direction/3.0f), ToTuple(pos/ MAP_SIZE + line.direction/3.0f + orca/10.0f));\
 	draw_line(0.5f, rgb(41.0f, 10.0f, 202.0f), ToTuple(pos / MAP_SIZE - line.direction/3.0f), ToTuple(pos/ MAP_SIZE - line.direction/3.0f + orca/10.0f));\
 }
-
+//#define DRAW_LINE2 DRAW_LINE
+#define DRAW_LINE2() void; 
 
 static const float MAP_SIZE = 300.0f;
 namespace RVO {
